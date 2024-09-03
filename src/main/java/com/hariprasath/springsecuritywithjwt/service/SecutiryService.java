@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface SecutiryService {
     void createUser(SecurityRequest securityRequest);
+
     List<SecurityResponse> getUserDetails();
 }

@@ -5,6 +5,7 @@ import com.hariprasath.springsecuritywithjwt.entity.SecurityResponse;
 import com.hariprasath.springsecuritywithjwt.service.SecutiryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,11 +17,16 @@ public class SecurityController {
     @Autowired
     SecutiryService securityService;
 
-    //     Uncomment and implement methods as needed
+    //Uncomment and implement methods as needed
     @PostMapping("/v1/createUser")
-    public String createUser(@RequestBody SecurityRequest securityRequest) {
-        securityService.createUser(securityRequest);
-        return "User created";
+    public ResponseEntity<String> createUser(@RequestBody SecurityRequest securityRequest) {
+        try {
+            securityService.createUser(securityRequest);
+            return ResponseEntity.ok("User created");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
 //     @GetMapping("/v1/get-CSRF-token")

@@ -17,14 +17,28 @@ public class SecutiryServiceImpl implements SecutiryService {
     @Autowired
     SecurityRepository securityRepository;
 
-     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
     public void createUser(SecurityRequest securityRequest) {
-        SecurityResponse securityResponse = new SecurityResponse();
-        securityResponse.setUsername(securityRequest.getUsername());
-        securityResponse.setPassword(encoder.encode(securityRequest.getPassword()));
-        securityResponse.setRole(securityRequest.getRole());
-        securityRepository.save(securityResponse);
+
+        // Check if username and password are not null or empty
+        if (securityRequest.getUsername() == null || securityRequest.getUsername().isEmpty()) {
+            throw new RuntimeException("Username must not be null or empty");
+        }
+        if (securityRequest.getPassword() == null || securityRequest.getPassword().isEmpty()) {
+            throw new RuntimeException("Password must not be null or empty");
+        }
+        // Check for existing user
+        List<SecurityResponse> existingUser = securityRepository.findByUsername(securityRequest.getUsername());
+        if (existingUser.size() == 0) {
+            SecurityResponse securityResponse = new SecurityResponse();
+            securityResponse.setUsername(securityRequest.getUsername());
+            securityResponse.setPassword(encoder.encode(securityRequest.getPassword()));
+            securityResponse.setRole(securityRequest.getRole());
+            securityRepository.save(securityResponse);
+        } else {
+            throw new RuntimeException("User with this username already exists");
+        }
     }
 
     @Override
@@ -32,6 +46,5 @@ public class SecutiryServiceImpl implements SecutiryService {
         List<SecurityResponse> userDetails = securityRepository.findAll();
         log.info(userDetails.toString());
         return userDetails;
-
     }
 }
