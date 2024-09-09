@@ -2,6 +2,7 @@ package com.hariprasath.springsecuritywithjwt.controller;
 
 import com.hariprasath.springsecuritywithjwt.entity.SecurityRequest;
 import com.hariprasath.springsecuritywithjwt.entity.SecurityResponse;
+import com.hariprasath.springsecuritywithjwt.entity.Users;
 import com.hariprasath.springsecuritywithjwt.service.SecutiryService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class SecurityController {
     SecutiryService securityService;
 
     //Uncomment and implement methods as needed
-    @PostMapping("/v1/createUser")
+    @PostMapping("/v1/register")
     public ResponseEntity<String> createUser(@RequestBody SecurityRequest securityRequest) {
         try {
             securityService.createUser(securityRequest);
@@ -43,5 +44,10 @@ public class SecurityController {
     public List<SecurityResponse> getUserDetails() {
         List<SecurityResponse> deails = securityService.getUserDetails();
         return deails;
+    }
+
+    @PostMapping("/v1/login")
+    public String userLogin(@RequestBody Users users) {
+        return securityService.verifyUserNameAndPassword(users);
     }
 }

@@ -2,10 +2,14 @@ package com.hariprasath.springsecuritywithjwt.service.services;
 
 import com.hariprasath.springsecuritywithjwt.entity.SecurityRequest;
 import com.hariprasath.springsecuritywithjwt.entity.SecurityResponse;
+import com.hariprasath.springsecuritywithjwt.entity.Users;
 import com.hariprasath.springsecuritywithjwt.repository.SecurityRepository;
 import com.hariprasath.springsecuritywithjwt.service.SecutiryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,12 @@ import java.util.List;
 public class SecutiryServiceImpl implements SecutiryService {
     @Autowired
     SecurityRepository securityRepository;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    JWTService jwtService;
 
     private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 
@@ -46,5 +56,15 @@ public class SecutiryServiceImpl implements SecutiryService {
         List<SecurityResponse> userDetails = securityRepository.findAll();
         log.info(userDetails.toString());
         return userDetails;
+    }
+
+    @Override
+    public String verifyUserNameAndPassword(Users users) {
+        Authentication authentication = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(users.getUsername(), users.getPassword()));
+        if (authentication.isAuthenticated()) {
+            return jwtService.generateToken(users.getUsername());
+        }
+        return "fail";
     }
 }
